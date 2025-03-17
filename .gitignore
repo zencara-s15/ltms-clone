@@ -1,0 +1,8 @@
+node_modules
+dist
+
+# environments
+.env
+
+# config
+config.json
