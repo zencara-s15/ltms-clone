@@ -1,16 +1,19 @@
-import { Sequelize } from "sequelize";
-import config from ".";
+import config from "./index"
+import { Sequelize } from 'sequelize-typescript'
+import logger from './helpers/logger'
 
-const { dbName, dbHost, dbPassword, dbUser, dbPort } = config.env;
+const { dbName, dbHost, dbPassword, dbUser, dbPort } = config.env
 
 const sequelize = new Sequelize({
   database: dbName,
+  dialect: "postgres",
   username: dbUser,
   password: dbPassword,
   host: dbHost,
-  dialect: "postgres",
   port: Number(dbPort),
-});
+  logging: false,
+  timezone: "UTC"
+})
 
 export async function dbConnection(
   retries = 5,
@@ -18,25 +21,18 @@ export async function dbConnection(
 ): Promise<Sequelize> {
   while (retries > 0) {
     try {
-      await sequelize.authenticate();
-      console.log("Database connection established");
+      await sequelize.authenticate()
+      logger.info("Database connection established")
 
-      if (
-        config.env.nodeEnv === "development" ||
-        config.env.nodeEnv === "test"
-      ) {
-        await sequelize.sync({ force: true });
-        console.log("Database synced");
-      }
-      return sequelize;
+      return sequelize
     } catch (error) {
-      console.log(error);
-      retries--;
-      console.log(`Retrying in ${delay / 1000} seconds...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      logger.error(error)
+      retries--
+      logger.warn(`Retrying in ${delay / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
   }
-  throw new Error("Failed to connect to database!");
+  throw new Error("Failed to connect to database!")
 }
 
-export default sequelize;
+export default sequelize

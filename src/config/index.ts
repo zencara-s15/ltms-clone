@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
+import { config } from "dotenv"
 
-dotenv.config();
+config()
 
 export default {
   env: {
@@ -18,4 +18,4 @@ export default {
     origin: process.env.ALLOWED_ORIGINS?.split(","), // Allow multiple origins
     optionsSuccessStatus: 200, // Some legacy browsers choke on 204
   },
-};
+}

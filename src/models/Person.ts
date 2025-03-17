@@ -1,18 +1,59 @@
-import { Model } from "sequelize";
-import { createHash } from "crypto";
+import {
+  Association,
+  Sequelize,
+  AutoIncrement,
+  Column,
+  DataType,
+  Default,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique
+} from 'sequelize-typescript'
 
-export default abstract class Person extends Model {
-  public id!: number;
-  public firstNameInKhmer!: string;
-  public lastNameInKhmer!: string;
-  public firstNameInEnglish!: string;
-  public lastNameInEnglish!: string;
-  public email!: string;
-  public readonly password!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+@Table({
+  modelName: "Person",
+  tableName: 'person',
+  timestamps: true,
+})
 
-  protected passwordHash(): string {
-    return createHash("sha256").update(this.password).digest("hex");
-  }
+export default class Person extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number
+
+  @Column(DataType.STRING)
+  khmerFirstName!: string
+
+  @Column(DataType.STRING)
+  khmerLastName!: string
+
+  @Column(DataType.STRING)
+  englishFirstName!: string
+
+  @Column(DataType.STRING)
+  englishLastName!: string
+
+  @Unique
+  @Column(DataType.STRING)
+  email!: string
+
+  @Column({
+    type: DataType.STRING(64),
+    validate: {
+      is: /^[0-9a-f]{64}$/i,
+    }
+  })
+  hashedPassword!: string
+
+  @Default(null)
+  @Column({
+    type: DataType.STRING,
+    validate: {
+      is: /\d{3}-\d{3}-\d{4}/
+    }
+  })
+  phone!: string
+
 }

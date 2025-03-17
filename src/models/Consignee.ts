@@ -1,55 +1,14 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db";
-import Person from "./Person";
+import { Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-class Consignee extends Person {
-  public readonly address!: string;
-  public readonly contactNumber!: string;
+@Table({
+  modelName: "Consignee",
+  tableName: 'consignee',
+  timestamps: false
+})
+export default class Consignee extends Model {
+  @PrimaryKey
+  @Unique
+  @Column(DataType.INTEGER)
+  id!: number
+
 }
-
-Consignee.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    contactNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize,
-    modelName: "consignee",
-    tableName: "consignee",
-    timestamps: true,
-  }
-);
-
-export default Consignee;

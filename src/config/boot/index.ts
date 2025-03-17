@@ -1,6 +1,7 @@
-import { type Express } from "express";
-import config from "..";
-import { dbConnection } from "../db";
+import { type Express } from "express"
+import config from "../index"
+import { dbConnection } from "../db"
+import logger from '../helpers/logger'
 
 /**
  * Boot the app
@@ -8,26 +9,32 @@ import { dbConnection } from "../db";
  * @param stopAfterSync Stop after syncing the database
  */
 export default async function bootApp(app: Express, stopAfterSync = false) {
-  const start = Date.now();
+  const start = Date.now()
 
   try {
     // stop early if needed
     if (stopAfterSync) {
-      process.exit();
+      process.exit()
     }
-    const { host, port } = config.env;
+    const { host, port, nodeEnv } = config.env
 
     // Connect to database
-    console.info("[boot] Connecting to database...");
-    await dbConnection();
+    logger.info("[boot] Connecting to database...")
+    const sequelize = await dbConnection()
+
+    // Sync only in development or testing environment.
+    if (nodeEnv !== 'production') {
+      await sequelize.sync({ force: true })
+      logger.warn(`Database synced (Using '${nodeEnv}' environment!)`)
+    }
 
     app.listen(port, () => {
-      console.info(`[boot] App listening on http://${host}:${port} 🚀`);
-      console.info(`[boot] App booted in ${Date.now() - start}ms ⏱`);
-    });
+      logger.info(`[boot] App listening on http://${host}:${port} 🚀`)
+      logger.info(`[boot] App booted in ${Date.now() - start}ms ⌚`)
+    })
   } catch (error) {
-    console.error("[boot] Unable to boot:", error);
+    logger.error("[boot] Unable to boot:", error)
 
-    process.exit(70);
+    process.exit(70)
   }
 }
